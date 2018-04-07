@@ -1,0 +1,87 @@
+\documentclass[notitlepage, amsmath, amssymb, aps]{revtex4-1}  % chktex 8
+%\documentclass[journal, onecolumn]{IEEEtran}
+
+\begin{document}
+
+\title{BAR with 3 ensembles}
+
+\author{Dong Zhou (4.6.2018)}
+\date{\today}
+
+
+\begin{abstract}
+In the same spirit of the original BAR paper, the idea is to find the minimum variance solution
+of the free energy difference estimator with respect to the weight functions.
+\end{abstract}
+
+\maketitle
+
+\section{introduction}
+
+The quantity of interest is the free energy difference between the two end points:
+
+\begin{align}
+\Delta A_{02} = \Delta A_{01} + \Delta A_{12}
+\end{align}
+where $\Delta A_{ij} \equiv A_i - A_j$ is the difference between two ensembles.
+
+For now, let's introduce two weight functions $w_{01}$ and $w_{12}$ for the neighboring ensembles.
+(We could also introduce $w_{02}$ and combine different estimators for $\Delta A_{02}$. Not included here.)
+Following the same derivation of BAR paper, we have
+
+\begin{align}
+\Delta A_{02} = \log\left<w_{01} e^{-u_1}\right>_0 - \log\left<w_{01}e^{-u_0}\right>_1
+              + \log\left<w_{12} e^{-u_2}\right>_1 - \log\left<w_{12}e^{-u_1}\right>_2
+\end{align}
+
+Note that the second and third terms are not statistically independent.
+If we ignore their covariance, then the variance of $\Delta A_{02}$ would simply be the sum of
+the variances of $\Delta A_{01}$ and $\Delta A_{12}$, and we can use the BAR result directly for the weight functions.
+The existence of an extra covariance term tells us that applying the 2-ensemble BAR formula for 01 and 12 separately is not optimal.
+
+\section{covariance term}
+I will use the following two formula without proof
+
+\begin{align}
+Var[f(X)-g(X)] &= Var[f(X)] + Var[g(X)] + 2Cov[f(X), g(X)] \\
+Cov[f(X), g(X)] &= f'(\left<X\right>)g'(\left<X\right>) Var[X]
+\end{align}
+where $X$ is a random variable, and $\left<X\right>$ is its expectation value with respect to an ensemble.
+
+The first one is trivial. The second one can be easily derived by expansion to second order.
+
+Recall in our case
+
+\begin{align}
+f(X) =& \log\left<w_{12} e^{-u_2}\right>_1 \\
+g(X) =& \log\left<w_{01}e^{-u_0}\right>_1
+\end{align}
+
+Similar to the variance derivation in my blog post, the covariance is given by
+
+\begin{align}
+Cov[f(X), g(X)] = \frac{1}{N_1}\sqrt{\left(\frac{\left<w_{12}^2 e^{-2u_2}\right>_1 }{\left<w_{12} e^{-u_2}\right>_1^2 } - 1\right)\left(\frac{\left<w_{01}^2e^{-2u_0}\right>_1}{\left<w_{01}e^{-u_0}\right>_1^2} - 1\right)}
+\end{align}
+
+
+\section{overall variance}
+
+Collecting all 4 variance terms and the covariance term, we have
+
+\begin{align}
+Var[\Delta A_{02}] =& \frac{\left<w_{01}|C_{01}+C_{10}|w_{01}\right>}{\left<w_{01}|B_{01}\right>\left<B_{01}|w_{01}\right>}
+            + \frac{\left< w_{12}|C_{12} + C_{21} |w_{12} \right>}{\left<w_{12}|B_{12} \right>\left<B_{12}|w_{12} \right>} \\
+            &+ 2\sqrt{\left(\frac{\left<w_{01}|C_{10}|w_{01}\right>}{\left<w_{01}|B_{01}\right>\left<B_{01}|w_{01}\right>} -\frac{1}{N_1}\right)
+                     \left(\frac{\left< w_{12}|C_{12} |w_{12} \right>}{\left<w_{12}|B_{12} \right>\left<B_{12}|w_{12} \right>} -\frac{1}{N_1}\right)}
+            - \frac{2}{N_1} - \frac{1}{N_0} - \frac{1}{N_2}
+\end{align}
+where the bra-ket notations are
+\begin{align}
+\left|B_{ij} \right> &= e^{-u_i - u_j} \\
+\left|w_{ij} \right> &= w_{ij} \\
+C_{ij} &= \frac{Q_i}{N_i} e^{-2u_j - u_i}
+\end{align}
+
+The next step would be taking derivatives to $\left|w_{01}\right>$ and $\left|w_{12}\right>$ to pin down their forms.
+
+\end{document}
