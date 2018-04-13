@@ -1,13 +1,11 @@
-\documentclass[notitlepage, amsmath, amssymb, aps]{revtex4-1}  % chktex 8
-%\documentclass[journal, onecolumn]{IEEEtran}
+\documentclass[notitlepage, amsmath, amssymb, aps]{revtex4-1}
 
 \begin{document}
 
 \title{BAR with 3 ensembles}
 
-\author{Dong Zhou (4.6.2018)}
+\author{Dong Zhou}
 \date{\today}
-
 
 \begin{abstract}
 In the same spirit of the original BAR paper, the idea is to find the minimum variance solution
@@ -26,7 +24,7 @@ The quantity of interest is the free energy difference between the two end point
 where $\Delta A_{ij} \equiv A_i - A_j$ is the difference between two ensembles.
 
 For now, let's introduce two weight functions $w_{01}$ and $w_{12}$ for the neighboring ensembles.
-(We could also introduce $w_{02}$ and combine different estimators for $\Delta A_{02}$. Not included here.)
+(We could also introduce $w_{02}$ and combine different estimators for $\Delta A_{02}$. See section~\ref{sec:combine}.)
 Following the same derivation of BAR paper, we have
 
 \begin{align}
@@ -47,7 +45,6 @@ Var[f(X)-g(X)] &= Var[f(X)] + Var[g(X)] + 2Cov[f(X), g(X)] \\
 Cov[f(X), g(X)] &= f'(\left<X\right>)g'(\left<X\right>) Var[X]
 \end{align}
 where $X$ is a random variable, and $\left<X\right>$ is its expectation value with respect to an ensemble.
-
 The first one is trivial. The second one can be easily derived by expansion to second order.
 
 Recall in our case
@@ -64,24 +61,107 @@ Cov[f(X), g(X)] = \frac{1}{N_1}\sqrt{\left(\frac{\left<w_{12}^2 e^{-2u_2}\right>
 \end{align}
 
 
-\section{overall variance}
+\section{variance optimization}
 
 Collecting all 4 variance terms and the covariance term, we have
 
-\begin{align}
-Var[\Delta A_{02}] =& \frac{\left<w_{01}|C_{01}+C_{10}|w_{01}\right>}{\left<w_{01}|B_{01}\right>\left<B_{01}|w_{01}\right>}
-            + \frac{\left< w_{12}|C_{12} + C_{21} |w_{12} \right>}{\left<w_{12}|B_{12} \right>\left<B_{12}|w_{12} \right>} \\
-            &+ 2\sqrt{\left(\frac{\left<w_{01}|C_{10}|w_{01}\right>}{\left<w_{01}|B_{01}\right>\left<B_{01}|w_{01}\right>} -\frac{1}{N_1}\right)
-                     \left(\frac{\left< w_{12}|C_{12} |w_{12} \right>}{\left<w_{12}|B_{12} \right>\left<B_{12}|w_{12} \right>} -\frac{1}{N_1}\right)}
+\begin{align*}
+Var[\Delta A_{02}] =& \frac{\left<w_{01}|C_{01}+C_{10}|w_{01}\right>}{\left<w_{01}|b_{01}\right>\left<b_{01}|w_{01}\right>}
+            + \frac{\left< w_{12}|C_{12} + C_{21} |w_{12} \right>}{\left<w_{12}|b_{12} \right>\left<b_{12}|w_{12} \right>} \\
+            &+ 2\sqrt{\left(\frac{\left<w_{01}|C_{10}|w_{01}\right>}{\left<w_{01}|b_{01}\right>\left<b_{01}|w_{01}\right>} -\frac{1}{N_1}\right)
+                     \left(\frac{\left< w_{12}|C_{12} |w_{12} \right>}{\left<w_{12}|b_{12} \right>\left<b_{12}|w_{12} \right>} -\frac{1}{N_1}\right)}
             - \frac{2}{N_1} - \frac{1}{N_0} - \frac{1}{N_2}
-\end{align}
+\end{align*}
 where the bra-ket notations are
 \begin{align}
-\left|B_{ij} \right> &= e^{-u_i - u_j} \\
+\left|b_{ij} \right> &= e^{-u_i - u_j} \\
 \left|w_{ij} \right> &= w_{ij} \\
 C_{ij} &= \frac{Q_i}{N_i} e^{-2u_j - u_i}
 \end{align}
 
-The next step would be taking derivatives to $\left|w_{01}\right>$ and $\left|w_{12}\right>$ to pin down their forms.
+To further simplify the notation, let's define
+\begin{align}
+    \gamma_{ij} &\equiv \frac{\left<w_{ij}|C_{ij}|w_{ij}\right>}{\left<w_{ij}|B_{ij}\right>\left<B_{ij}|w_{ij}\right>} \\
+    w_{ij} &= w_{ji}
+\end{align}
+
+Then we have
+\begin{align}
+    Var[\Delta A_{02}] = \gamma_{01} + \gamma_{10} + \gamma_{12} + \gamma_{21}
+                        + 2\sqrt{\left(\gamma_{10} - \frac{1}{N_1}\right)\left(\gamma_{12} - \frac{1}{N_1}\right)}
+                        - \frac{2}{N_1} - \frac{1}{N_0} - \frac{1}{N_2}
+    \label{eq:var_02}
+\end{align}
+
+Setting its first variation to 0 with respect to $\left<w_{01}\right|$ and $\left<w_{12}\right|$, we get two secular equations.
+One of them is
+
+\begin{align}
+    \frac{1}{\gamma_{01}+\gamma_{10}\left(1+\sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}}\right)} \left|w_{01}\right> = \left(C_{01}+C_{10}\left(1+\sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}}\right) \right)^{-1} \left|b_{01}\right>\left<b_{01}|w_{01}\right> 
+\end{align}
+The other one has the same form.
+In the derivation we have used
+\begin{align}
+    \frac{\partial\gamma_{ij}}{\partial \left<w_{ij}\right|} = \frac{C_{ij} - \gamma_{ij}\left|b_{ij}\right>\left<b_{ij}\right|}{\left<w_{ij}|b_{ij}\right>\left<b_{ij}|w_{ij} \right>}\left|w_{ij}\right>
+\end{align}
+
+Because $\left|b_{ij}\right>\left<b_{ij}\right|$ is a projection, these secula equations have unique solutions.
+For example
+
+\begin{align}
+    \left|w_{01}\right> = & \left(C_{01} + C_{10}\left(1+ \sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}}\right) \right)^{-1}\left|b_{01}\right> \label{eq:w01} \\
+    \frac{1}{\gamma_{01} + \gamma_{10}\left(1+\sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}} \right)} = & \left<b_{01}\right| \left(C_{01} + C_{10}\left(1+\sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}} \right) \right)^{-1}\left|b_{01}\right>
+\end{align}
+
+Note that this solution of $w_{ij}$ differs from the 2-ensemble BAR result by a square root term.
+And if we simply use the 2-ensemble BAR result of $w_{ij}$,
+the overall variance is not simply the sum of individual variances:
+there is an extra covariance contribution in $\Delta A_{02}$ that is not currently accounted for, as seen in Eq.~\ref{eq:var_02}.
+
+There are a few things we can do at this point:
+
+\begin{itemize}
+    \item Seek exact analytical solution. Maybe use ansatz solutions, e.g., summation form, product form; or introduce another variable for the square root term, and see what equation it satisfies.
+    \item Develop approximate solution. For example, use perturbation theory with the 2-ensemble BAR result as zeroth order; or introduce some simplifying assumptions.
+    \item Seek numerical solution. For example we can probably use the 2-ensemble BAR result as starting point for an iterative solver.
+    \item Find the physical meaning of $\gamma_{ij}$ and range of its value. To start with, we can use some special form of $w_{ij}$.
+    \item Find how the other multi-ensemble methods link to this solution. What are their simplifying assumptions?
+\end{itemize}
+
+\section{extension to $N$ ensembles}
+
+We are interested in the free energy difference between the two end ensembles.
+There are different ways to form this estimator (see next session),
+the simplest is to use only estimators of neighboring ensembles, i.e.,
+
+\begin{align}
+    \Delta A_{0N} = \sum_{i=0}^{N-1}\Delta A_{i,i+1}.
+\end{align}
+
+The derivation of its variance is similar to the 3-ensemble case:
+there is one covariance terms for each internal ensembles, i.e.,
+
+\begin{align}
+    Var[\Delta A_{0N}] = \sum_{i=0}^{N-1}Var[\Delta A_{i,i+1}] 
+    + 2\sum_{i=1}^{N-2}Cov[\log\left<w_{i-1,i}e^{-u_{i-1}}\right>_i, \log\left<w_{i, i+1}e^{-u_{i+1}}\right>_i].
+\end{align}
+
+And the corresponding weight functions have the same form of Eq.~\ref{eq:w01},
+simply replacing $1$ with $i$, $0$ with $i-1$, and $2$ with $i+1$.
+
+
+\section{combining different estimators} \label{sec:combine}
+
+With $N>2$, there exist multiple estimators for the free energy difference of the two end ensembles.
+We can combine them into new estimators.
+Take $N=3$ for example,
+
+\begin{align}
+    \Delta A = \alpha (\Delta A_{01} + \Delta A_{12}) + (1-\alpha)\Delta A_{02}
+\end{align}
+where $\alpha$ is to be determined.
+
+In this case, there is one covariance term for each ensemble, both internal and end ones.
+
 
 \end{document}
