@@ -8,7 +8,7 @@
 \date{\today}
 
 \begin{abstract}
-In the same spirit of the original BAR paper, the idea is to find the minimum variance solution
+    In the same spirit of the original BAR paper \cite{bennett76}, the idea is to find the minimum variance solution
 of the free energy difference estimator with respect to the weight functions.
 \end{abstract}
 
@@ -25,7 +25,7 @@ where $\Delta A_{ij} \equiv A_i - A_j$ is the difference between two ensembles.
 
 For now, let's introduce two weight functions $w_{01}$ and $w_{12}$ for the neighboring ensembles.
 (We could also introduce $w_{02}$ and combine different estimators for $\Delta A_{02}$. See section~\ref{sec:combine}.)
-Following the same derivation of BAR paper, we have
+Following the same derivation as \cite{bennett76}, we have
 
 \begin{align}
 \Delta A_{02} = \log\left<w_{01} e^{-u_1}\right>_0 - \log\left<w_{01}e^{-u_0}\right>_1
@@ -33,16 +33,56 @@ Following the same derivation of BAR paper, we have
 \end{align}
 
 Note that the second and third terms are not statistically independent.
-If we ignore their covariance, then the variance of $\Delta A_{02}$ would simply be the sum of
+If we ignore their covariance, then the variance of $\Delta A_{02}$ would be simply the sum of
 the variances of $\Delta A_{01}$ and $\Delta A_{12}$, and we can use the BAR result directly for the weight functions.
 The existence of an extra covariance term tells us that applying the 2-ensemble BAR formula for 01 and 12 separately is not optimal.
+
+\section{brief review of the 2-ensemble BAR result}
+
+In this case, there is only one weight function $w_{01}$. And the free energy difference is
+
+\begin{align}
+    \Delta A_{01} = \log\frac{\left<w_{01}e^{-u_1}\right>_0}{\left<w_{01}e^{-u_0}\right>_1}
+\end{align}
+
+Recall that the expectation $\left<f\right>_i$ has two interpretations, either as an integration, or as a summation, i.e.,
+
+\begin{align}
+    \left<f\right>_i = \frac{\int f(q) e^{-u_i} dq}{Q_i} \simeq \frac{1}{N_i} \sum_{k=1}^{N_i}f(q_k) \label{eq:avg}
+\end{align}
+where $q$ denotes all the spatial variables, $Q_i$ is the partition function,
+$N_i$ is the number of samples in the ensemble,
+and $q_k$ can be viewed either as a concrete sample or as one of the $N_i$ IID random variables.
+Both interpretations will be used in this note.
+
+To proceed, I will use the following identity
+
+\begin{align}
+    Var[f(X)]\simeq f'(\left<X\right>)^2Var[X]
+\end{align}
+where $X$ is a random variable, and $\left<X\right>$ is its expectation value with respect to an ensemble.
+
+The variance of $\Delta A_{01}$ can be written as a quadratic form
+
+\begin{align}
+    Var[\Delta A_{01}] = \frac{\xi^2_{01}}{N_0} + \frac{\xi^2_{10}}{N_1}
+\end{align}
+where $\xi_{ij}$ is the coefficient of variation
+\begin{align}
+    \xi_{ij}^2 \equiv \frac{\left<w_{ij}^2e^{-2u_i}\right>_j - \left<w_{ij}e^{-u_i}\right>_j^2}{\left<w_{ij}e^{-u_i}\right>_j^2}
+\end{align}
+
+Minimizing the variance with respect to the weight function gives rise to
+\begin{align}
+    w_{01} = \frac{1}{\frac{Q_0}{N_0}e^{-u_1} + \frac{Q_1}{N_1}e^{-u_0}}
+\end{align}
 
 \section{covariance term}
 I will use the following two formula without proof
 
 \begin{align}
 Var[f(X)-g(X)] &= Var[f(X)] + Var[g(X)] + 2Cov[f(X), g(X)] \\
-Cov[f(X), g(X)] &= f'(\left<X\right>)g'(\left<X\right>) Var[X]
+Cov[f(X), g(X)] &\simeq f'(\left<X\right>)g'(\left<X\right>) Var[X]
 \end{align}
 where $X$ is a random variable, and $\left<X\right>$ is its expectation value with respect to an ensemble.
 The first one is trivial. The second one can be easily derived by expansion to second order.
@@ -57,7 +97,8 @@ g(X) =& \log\left<w_{01}e^{-u_0}\right>_1
 Similar to the variance derivation in my blog post, the covariance is given by
 
 \begin{align}
-Cov[f(X), g(X)] = \frac{1}{N_1}\sqrt{\left(\frac{\left<w_{12}^2 e^{-2u_2}\right>_1 }{\left<w_{12} e^{-u_2}\right>_1^2 } - 1\right)\left(\frac{\left<w_{01}^2e^{-2u_0}\right>_1}{\left<w_{01}e^{-u_0}\right>_1^2} - 1\right)}
+Cov[f(X), g(X)] = \frac{1}{N_1}\sqrt{\left(\frac{\left<w_{12}^2 e^{-2u_2}\right>_1 }{\left<w_{12} e^{-u_2}\right>_1^2 } - 1\right)
+        \left(\frac{\left<w_{01}^2e^{-2u_0}\right>_1}{\left<w_{01}e^{-u_0}\right>_1^2} - 1\right)}
 \end{align}
 
 
@@ -65,52 +106,60 @@ Cov[f(X), g(X)] = \frac{1}{N_1}\sqrt{\left(\frac{\left<w_{12}^2 e^{-2u_2}\right>
 
 Collecting all 4 variance terms and the covariance term, we have
 
-\begin{align*}
-Var[\Delta A_{02}] =& \frac{\left<w_{01}|C_{01}+C_{10}|w_{01}\right>}{\left<w_{01}|b_{01}\right>\left<b_{01}|w_{01}\right>}
-            + \frac{\left< w_{12}|C_{12} + C_{21} |w_{12} \right>}{\left<w_{12}|b_{12} \right>\left<b_{12}|w_{12} \right>} \\
-            &+ 2\sqrt{\left(\frac{\left<w_{01}|C_{10}|w_{01}\right>}{\left<w_{01}|b_{01}\right>\left<b_{01}|w_{01}\right>} -\frac{1}{N_1}\right)
-                     \left(\frac{\left< w_{12}|C_{12} |w_{12} \right>}{\left<w_{12}|b_{12} \right>\left<b_{12}|w_{12} \right>} -\frac{1}{N_1}\right)}
-            - \frac{2}{N_1} - \frac{1}{N_0} - \frac{1}{N_2}
-\end{align*}
-where the bra-ket notations are
 \begin{align}
-\left|b_{ij} \right> &= e^{-u_i - u_j} \\
-\left|w_{ij} \right> &= w_{ij} \\
-C_{ij} &= \frac{Q_i}{N_i} e^{-2u_j - u_i}
-\end{align}
-
-To further simplify the notation, let's define
-\begin{align}
-    \gamma_{ij} &\equiv \frac{\left<w_{ij}|C_{ij}|w_{ij}\right>}{\left<w_{ij}|B_{ij}\right>\left<B_{ij}|w_{ij}\right>} \\
-    w_{ij} &= w_{ji}
-\end{align}
-
-Then we have
-\begin{align}
-    Var[\Delta A_{02}] = \gamma_{01} + \gamma_{10} + \gamma_{12} + \gamma_{21}
-                        + 2\sqrt{\left(\gamma_{10} - \frac{1}{N_1}\right)\left(\gamma_{12} - \frac{1}{N_1}\right)}
-                        - \frac{2}{N_1} - \frac{1}{N_0} - \frac{1}{N_2}
+    Var[\Delta A_{02}] = \frac{\gamma_{01}-1}{N_0}
+                        + \frac{\gamma_{10} + \gamma_{12} +2\sqrt{\left(\gamma_{10} - 1\right)\left(\gamma_{12} - 1\right)} -2}{N_1}
+                        + \frac{\gamma_{21}-1}{N_2}
     \label{eq:var_02}
+\end{align}
+where $N_i$ is the number of samples in each ensemble, the individual terms are defined as
+\begin{align}
+\gamma_{ij} &\equiv \frac{\left<w_{ij}|C_{ij}|w_{ij}\right>}{\left<w_{ij}|b_{ij}\right>\left<b_{ij}|w_{ij}\right>}
+     = \frac{\int e^{-u_i}dq\int w_{ij}^2e^{-2u_j - u_i}dq}{\left(\int w_{ij}e^{-u_i-u_j}dq\right)^2}
+     = \frac{\left<w^2_{ij}e^{-2u_j}\right>_i}{\left<w_{ij}e^{-u_j} \right>_i^2}
+     = \frac{\left<w^2_{ij}e^{-u_i-u_j}\right>_j}{\left<w_{ij}e^{-u_j} \right>_i\left<w_{ij}e^{-u_i} \right>_j} \\
+C_{ij} &\equiv Q_i e^{-2u_j - u_i} \\
+\left|b_{ij} \right> &\equiv e^{-u_i - u_j} \\
+\left|w_{ij} \right> &\equiv w_{ij} = w_{ji}
+\end{align}
+
+Notice how each term is inversely proportional to the number of samples in the ensembles.
+This is a direct result of central limit theorem.
+Also note that the numerator of the $N_1$ term is a perfect square.
+In fact, we can introduce another parameter
+
+\begin{align}
+    \xi^2_{ij} \equiv \gamma_{ij} - 1
+     = \frac{\left<w_{ij}^2e^{-2u_j}\right>_i- \left<w_{ij}e^{-u_j} \right>_i^2}{\left<w_{ij}e^{-u_j} \right>_i^2}
+\end{align}
+Here $\xi_{ij}$ is the coefficient of variation for the random variable $w_{ij}e^{-u_j}$ whose distribution is with respect to ensemble $i$.
+
+Then the overall variance is a simple quadratic form
+\begin{align}
+    Var[\Delta A_{02}] = \frac{\xi^2_{01}}{N_0} + \frac{(\xi_{10}+\xi_{12})^2}{N_1} + \frac{\xi^2_{21}}{N_2}
 \end{align}
 
 Setting its first variation to 0 with respect to $\left<w_{01}\right|$ and $\left<w_{12}\right|$, we get two secular equations.
 One of them is
 
 \begin{align}
-    \frac{1}{\gamma_{01}+\gamma_{10}\left(1+\sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}}\right)} \left|w_{01}\right> = \left(C_{01}+C_{10}\left(1+\sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}}\right) \right)^{-1} \left|b_{01}\right>\left<b_{01}|w_{01}\right> 
+    \frac{1}{\gamma_{01}+\gamma_{10}\left(1+\sqrt{\frac{\gamma_{12}-1}{\gamma_{10}-1}}\right)} \left|w_{01}\right> 
+    = \left(\frac{C_{01}}{N_0}+\frac{C_{10}}{N_1}\left(1+\sqrt{\frac{\gamma_{12}-1}{\gamma_{10}-1}}\right) \right)^{-1} \left|b_{01}\right>\left<b_{01}|w_{01}\right> 
 \end{align}
 The other one has the same form.
 In the derivation we have used
 \begin{align}
-    \frac{\partial\gamma_{ij}}{\partial \left<w_{ij}\right|} = \frac{C_{ij} - \gamma_{ij}\left|b_{ij}\right>\left<b_{ij}\right|}{\left<w_{ij}|b_{ij}\right>\left<b_{ij}|w_{ij} \right>}\left|w_{ij}\right>
+    \frac{\partial\gamma_{ij}}{\partial \left<w_{ij}\right|} = \frac{\frac{C_{ij}}{N_i} - \gamma_{ij}\left|b_{ij}\right>\left<b_{ij}\right|}{\left<w_{ij}|b_{ij}\right>\left<b_{ij}|w_{ij} \right>}\left|w_{ij}\right>
 \end{align}
 
 Because $\left|b_{ij}\right>\left<b_{ij}\right|$ is a projection, these secula equations have unique solutions.
 For example
 
 \begin{align}
-    \left|w_{01}\right> = & \left(C_{01} + C_{10}\left(1+ \sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}}\right) \right)^{-1}\left|b_{01}\right> \label{eq:w01} \\
-    \frac{1}{\gamma_{01} + \gamma_{10}\left(1+\sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}} \right)} = & \left<b_{01}\right| \left(C_{01} + C_{10}\left(1+\sqrt{\frac{\gamma_{12}-\frac{1}{N_1}}{\gamma_{10}-\frac{1}{N_1}}} \right) \right)^{-1}\left|b_{01}\right>
+    \left|w_{01}\right> = & \left(\frac{C_{01}}{N_0} + \frac{C_{10}}{N_1}\left(1+ \sqrt{\frac{\gamma_{12}-1}{\gamma_{10}-1}}\right) \right)^{-1}\left|b_{01}\right>
+    =\frac{1}{\frac{Q_0}{N_0}e^{-u_1} + \frac{Q_1}{N_1}e^{-u_0}\left(1+\sqrt{\frac{\xi_{12}}{\xi_{10}}} \right)} \label{eq:w01} \\
+    \frac{1}{\gamma_{01} + \gamma_{10}\left(1+\sqrt{\frac{\gamma_{12}-1}{\gamma_{10}-1}} \right)} = & 
+    \left<b_{01}\right| \left(\frac{C_{01}}{N_0} + \frac{C_{10}}{N_1}\left(1+\sqrt{\frac{\gamma_{12}-1}{\gamma_{10}-1}} \right) \right)^{-1}\left|b_{01}\right>
 \end{align}
 
 Note that this solution of $w_{ij}$ differs from the 2-ensemble BAR result by a square root term.
@@ -128,40 +177,76 @@ There are a few things we can do at this point:
     \item Find how the other multi-ensemble methods link to this solution. What are their simplifying assumptions?
 \end{itemize}
 
-\section{extension to $N$ ensembles}
+\section{extension to $M+1$ ensembles}
 
 We are interested in the free energy difference between the two end ensembles.
 There are different ways to form this estimator (see next session),
 the simplest is to use only estimators of neighboring ensembles, i.e.,
 
 \begin{align}
-    \Delta A_{0N} = \sum_{i=0}^{N-1}\Delta A_{i,i+1}.
+    \Delta A_{0M} = \sum_{i=0}^{M-1}\Delta A_{i,i+1}. \label{eq:A_0N}
 \end{align}
 
 The derivation of its variance is similar to the 3-ensemble case:
 there is one covariance terms for each internal ensembles, i.e.,
 
 \begin{align}
-    Var[\Delta A_{0N}] = \sum_{i=0}^{N-1}Var[\Delta A_{i,i+1}] 
-    + 2\sum_{i=1}^{N-2}Cov[\log\left<w_{i-1,i}e^{-u_{i-1}}\right>_i, \log\left<w_{i, i+1}e^{-u_{i+1}}\right>_i].
+    Var[\Delta A_{0M}] =& \sum_{i=0}^{M-1}Var[\Delta A_{i,i+1}]
+    + 2\sum_{i=1}^{M-1}Cov[\log\left<w_{i-1,i}e^{-u_{i-1}}\right>_i, \log\left<w_{i, i+1}e^{-u_{i+1}}\right>_i]\\
+    =& \frac{\xi_{01}}{N_0}
+      + \sum_{i=1}^{M-1}\frac{(\xi_{i,i-1} + \xi_{i,i+1})^ 2}{N_i}
+      + \frac{\xi_{M, M-1}}{N_{M}}.
 \end{align}
-
 And the corresponding weight functions have the same form of Eq.~\ref{eq:w01},
-simply replacing $1$ with $i$, $0$ with $i-1$, and $2$ with $i+1$.
+simply replace $1$ with $i$, $0$ with $i-1$, and $2$ with $i+1$.
 
+Lingle raised the question of whether $\Delta A_{0N}$ takes the same numerical value if the non-adjacent ensembles are used.
+Take 4 ensembles for example, Eq.~\ref{eq:A_0N} is using ensemble pairs 01, 12, 23.
+What if we use 02, 21, 13?
 
 \section{combining different estimators} \label{sec:combine}
 
-With $N>2$, there exist multiple estimators for the free energy difference of the two end ensembles.
+With $M>1$, there exist multiple estimators for the free energy difference of the two end ensembles.
 We can combine them into new estimators.
-Take $N=3$ for example,
+Take $M=2$ for example,
 
 \begin{align}
     \Delta A = \alpha (\Delta A_{01} + \Delta A_{12}) + (1-\alpha)\Delta A_{02}
 \end{align}
-where $\alpha$ is to be determined.
+where $\alpha$ is to be determined as well, together with the weight functions.
+Note that the subscripts on $\Delta A$ denote the ensembles being used.
 
 In this case, there is one covariance term for each ensemble, both internal and end ones.
 
 
+\section{relation to other estimators}
+
+Any weight function satisfies the following equations
+
+\begin{align}
+    Q_i\left< w_{ij}e^{-u_j}\right>_i = Q_j\left<w_{ij}e^{-u_i} \right>_j
+\end{align}
+and the goal of any free energy difference estimator is achieve certain good
+statistics property by picking special forms of $w_{ij}$.
+
+\subsection{extended bridge sampling estimator / MBAR}
+
+The MBAR paper \cite{shirts08} used result from \cite{tan04}.
+In this method \cite{tan04}, the author introduced extra constraints for the weight functions, i.e.,
+
+\begin{align}
+    \sum_j Q_i\left< w_{ij}e^{-u_j}\right>_i = \sum_j Q_j\left<w_{ij}e^{-u_i} \right>_j
+\end{align}
+for all $i$, where the expectations are replaced by the empirical estimators, as in Eq.~{eq:avg}.
+In general, there are $N$-choose-$2$ weight functions, and only $N$ such constraints.
+Something else is needed to fully pin down the form of the weight functions.
+
+In the end, the weight functions are given by
+\begin{align}
+    w_{ij} = \frac{N_j Q_j^{-1}}{\sum_k N_k Q_k^{-1}e^{-u_k}}
+\end{align}
+
+\subsection{WHAM}
+
+\bibliography{nbar_ref}
 \end{document}
